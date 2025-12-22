@@ -43,12 +43,8 @@
             transition: 0.3s;
         }
 
-        /* === عنصر التحميل الداخلي (داخل نفس الشاشة) === */
-        .inner-loader {
-            display: none; /* مخفي افتراضياً */
-            margin-top: 15px;
-            text-align: center;
-        }
+        /* === عنصر التحميل الداخلي === */
+        .inner-loader { display: none; margin-top: 15px; text-align: center; }
         .inner-spinner {
             width: 30px; height: 30px; border: 3px solid #eee; 
             border-top: 3px solid var(--main); border-radius: 50%;
@@ -57,18 +53,27 @@
         .loading-text { font-size: 14px; font-weight: 700; color: #666; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* === أنيميشن النجاح (الشاشة الكاملة) === */
-        .success-overlay {
+        /* === أنيميشن النجاح والفشل (الشاشة الكاملة) === */
+        .overlay-anim {
             position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 10002;
             display: none; align-items: center; justify-content: center; flex-direction: column;
         }
+        
+        /* علامة الصح */
         .checkmark-wrapper { width: 100px; height: 100px; }
         .checkmark__circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: var(--success-green); fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
         .checkmark { width: 100px; height: 100px; border-radius: 50%; display: block; stroke-width: 2; stroke: var(--white); stroke-miterlimit: 10; margin: 10% auto; box-shadow: inset 0px 0px 0px var(--success-green); animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both; }
         .checkmark__check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
+
+        /* علامة الخطأ (X) */
+        .cross__circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: var(--red); fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+        .crossmark { width: 100px; height: 100px; border-radius: 50%; display: block; stroke-width: 2; stroke: var(--white); stroke-miterlimit: 10; margin: 10% auto; box-shadow: inset 0px 0px 0px var(--red); animation: fillRed .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both; }
+        .cross__path { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
+
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
         @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
         @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 50px var(--success-green); } }
+        @keyframes fillRed { 100% { box-shadow: inset 0px 0px 0px 50px var(--red); } }
 
         /* === التطبيق === */
         #app-view { display: none; padding-top: 130px; padding-bottom: 90px; }
@@ -94,7 +99,8 @@
             padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
             display: none; z-index: 999; max-height: 300px; overflow-y: auto;
         }
-        .notif-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; color: #555; display: flex; align-items: center; gap: 10px; }
+        .notif-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; color: #555; display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fff; transition: 0.2s; }
+        .notif-item:active { background: #f0f0f0; }
         .notif-item i { color: var(--gold); }
 
         .container { padding: 0 15px; display: none; }
@@ -116,7 +122,7 @@
             50% { box-shadow: 0 0 20px var(--gold); transform: scale(1.02); border: 2px solid var(--gold); }
             100% { box-shadow: 0 0 5px var(--gold); transform: scale(1); border: 2px solid transparent; }
         }
-        .flash-card { animation: flashAnim 1s infinite; z-index: 10; }
+        .flash-card { animation: flashAnim 1s infinite; z-index: 10; scroll-margin-top: 140px; }
 
         .btn-action { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-contact { background: var(--gold); color: black; }
@@ -137,15 +143,17 @@
         .modal-box { background: white; width: 90%; max-width: 350px; padding: 25px; border-radius: 25px; text-align: center; position: relative; }
         .img-viewer { width: 100%; max-height: 80vh; object-fit: contain; }
         .close-img { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 2001; }
+        
         .contact-row { display: flex; align-items: center; gap: 12px; background: #f8f8f8; padding: 12px; border-radius: 15px; margin-bottom: 10px; text-align: right; }
         .c-icon { font-size: 24px; width: 35px; text-align: center; }
         .c-text { font-weight: 700; font-size: 15px; color: var(--dark); text-decoration: none; word-break: break-all; }
-        .c-link { color: var(--facebook); text-decoration: underline; cursor: pointer; font-size: 14px; }
+        .c-link { color: var(--facebook); text-decoration: underline; cursor: pointer; font-size: 14px; display: block; width: 100%; }
+
     </style>
 </head>
 <body>
 
-    <div id="success-anim" class="success-overlay">
+    <div id="success-anim" class="overlay-anim">
         <div class="checkmark-wrapper">
             <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
                 <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
@@ -153,6 +161,17 @@
             </svg>
         </div>
         <h3 style="margin-top:20px; font-weight:900; color:var(--dark);">تم إنشاء الحساب</h3>
+    </div>
+
+    <div id="fail-anim" class="overlay-anim">
+        <div class="checkmark-wrapper">
+            <svg class="crossmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="cross__circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="cross__path" fill="none" d="M16 16 36 36 M36 16 16 36" stroke="white" stroke-width="2"/>
+            </svg>
+        </div>
+        <h3 style="margin-top:20px; font-weight:900; color:var(--red);">فشل الفحص!</h3>
+        <p style="color:#666; font-size:14px;">البيانات غير صحيحة</p>
     </div>
 
     <div id="register-view" class="auth-container">
@@ -253,8 +272,8 @@
         let currentUser = null; 
         const EXPIRATION_TIME = 5 * 24 * 60 * 60 * 1000; 
 
-        function addNotification(userId, msg) {
-            const notif = { userId, msg, time: new Date().toLocaleTimeString(), read: false };
+        function addNotification(userId, msg, prodId) {
+            const notif = { userId, msg, prodId, time: new Date().toLocaleTimeString(), read: false };
             notificationsDB.unshift(notif);
             localStorage.setItem('ar_notifs', JSON.stringify(notificationsDB));
             renderNotifs();
@@ -272,10 +291,28 @@
                 badge.style.display = 'none';
             } else {
                 myNotifs.forEach(n => {
-                    list.innerHTML += `<div class="notif-item"><i class="fas fa-bell"></i><div>${n.msg}<br><small style="color:#999;">${n.time}</small></div></div>`;
+                    let clickAction = '';
+                    if(n.prodId) {
+                        clickAction = `onclick="goToProduct(${n.prodId})"`;
+                    }
+                    list.innerHTML += `<div class="notif-item" ${clickAction}><i class="fas fa-bell"></i><div>${n.msg}<br><small style="color:#999;">${n.time}</small></div></div>`;
                 });
                 badge.style.display = 'block';
             }
+        }
+
+        function goToProduct(id) {
+            switchTab('home', document.querySelector('.nav-item')); 
+            toggleNotif(); 
+            
+            setTimeout(() => {
+                const el = document.getElementById('card-' + id);
+                if(el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.add('flash-card');
+                    setTimeout(() => el.classList.remove('flash-card'), 2000);
+                }
+            }, 300);
         }
 
         function cleanOldProducts() {
@@ -284,12 +321,22 @@
             
             expired.forEach(p => {
                 if(currentUser && p.ownerId === currentUser.id) {
-                    addNotification(currentUser.id, `تم حذف إعلانك (سعر ${p.price}) لانتهاء مدة الـ 5 أيام.`);
+                    addNotification(currentUser.id, `تم حذف إعلانك (سعر ${p.price}) لانتهاء مدة الـ 5 أيام.`, null);
                 }
             });
 
             productsDB = productsDB.filter(p => (now - p.id) < EXPIRATION_TIME);
             localStorage.setItem('ar_products', JSON.stringify(productsDB));
+        }
+
+        function showFail() {
+            document.getElementById('inner-loading').style.display = 'none';
+            document.getElementById('fail-anim').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('fail-anim').style.display = 'none';
+                document.getElementById('reg-btn').style.display = 'block';
+            }, 2000);
         }
 
         function processRegister() {
@@ -301,25 +348,32 @@
             if(!user || !pass || !phone || !fb) { alert('أكمل البيانات'); return; }
             if(usersDB.some(u => u.user === user)) { showError('reg-user'); return; }
 
-            // 1. إخفاء الزر وإظهار اللودر الداخلي
+            // إخفاء الزر وإظهار اللودر
             document.getElementById('reg-btn').style.display = 'none';
             document.getElementById('inner-loading').style.display = 'block';
 
-            // 2. الانتظار 2 ثانية
             setTimeout(() => {
-                // حفظ البيانات
+                // فحص الرقم (يبدأ بـ 010, 011, 012, 015 وطوله 11)
+                const phoneRegex = /^01[0125]\d{8}$/;
+                if(!phoneRegex.test(phone)) {
+                    showFail(); return;
+                }
+
+                // فحص الفيسبوك (يجب أن يحتوي على facebook.com ومسار إضافي)
+                const fbRegex = /facebook\.com\/.+/;
+                if(!fbRegex.test(fb)) {
+                    showFail(); return;
+                }
+
+                // نجاح
                 usersDB.push({ id: Date.now(), user, pass, phone, fb });
                 localStorage.setItem('ar_users', JSON.stringify(usersDB));
 
-                // 3. إظهار شاشة النجاح الكاملة
                 document.getElementById('success-anim').style.display = 'flex';
                 
-                // 4. الانتظار 2 ثانية ثم الانتقال
                 setTimeout(() => {
                     document.getElementById('success-anim').style.display = 'none';
                     showLoginView();
-                    
-                    // إعادة الزر لوضعه الطبيعي (للمرات القادمة)
                     document.getElementById('reg-btn').style.display = 'block';
                     document.getElementById('inner-loading').style.display = 'none';
                 }, 2000);
@@ -356,15 +410,19 @@
                     const scale = 800 / img.width; cvs.width = 800; cvs.height = img.height * scale;
                     ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
                     
+                    const prodId = Date.now();
                     productsDB.push({
-                        id: Date.now(), ownerId: currentUser.id,
+                        id: prodId, ownerId: currentUser.id,
                         img: cvs.toDataURL('image/jpeg', 0.7),
                         price, type, desc,
                         contactPhone: currentUser.phone, contactFb: currentUser.fb
                     });
                     
                     localStorage.setItem('ar_products', JSON.stringify(productsDB));
-                    addNotification('all', `تم نشر عرض جديد بسعر ${price} ج.م`);
+                    
+                    // إشعار عام للكل
+                    addNotification('all', `تم نشر عرض جديد بسعر ${price} ج.م`, prodId);
+
                     document.getElementById('add-modal').style.display = 'none';
                     renderProducts();
                 }
@@ -401,7 +459,7 @@
                     `<button class="btn-action btn-contact" onclick="showContact('${p.contactPhone}', '${p.contactFb}')"><i class="fas fa-comment-dots"></i> تواصل مع البائع</button>`;
 
                 const html = `
-                    <div class="card ${flashClass}">
+                    <div id="card-${p.id}" class="card ${flashClass}">
                         <span class="timer-badge"><i class="far fa-clock"></i> ${timerText}</span>
                         <img src="${p.img}" onclick="viewImage('${p.img}')">
                         <div class="card-info">
